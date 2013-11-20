@@ -45,10 +45,17 @@ public class Effects {
 	 * 
 	 * @param plugin - Plugin instance that spawns the tornado.
 	 * @param location - Location to spawn the tornado.
+	 * @param direction - The direction the tornade should move in.
+	 * @param speed - How fast it moves in the given direction. Warning! A number greater than 0.3 makes it look wierd.
 	 * @param amount_of_blocks - The max amount of blocks that can exist in the tornado.
 	 * @param time - The amount of seconds the tornado should be alive.
 	 */
-	public static void spawnTornado(final JavaPlugin plugin, final Location location, final int amount_of_blocks, int time) {
+	public static void spawnTornado(final JavaPlugin plugin, final Location location, final Vector direction, final double speed, final int amount_of_blocks, int time) {
+		
+		// Modify the direction vector using the speed argument.
+		if(direction != null) {
+			direction.normalize().multiply(speed);
+		}
 		   
 	    class VortexBlock {
 	       
@@ -92,6 +99,10 @@ public class Effects {
 	                    VortexBlock vb = blocks.get(0);
 	                    vb.entity.remove();
 	                    blocks.remove(vb);
+	                }
+	                
+	                if(direction != null) {
+	                	location.add(direction);
 	                }
 	               
 	                blocks.add(new VortexBlock(location));
