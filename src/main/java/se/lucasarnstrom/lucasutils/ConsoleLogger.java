@@ -41,29 +41,30 @@ import org.fusesource.jansi.Ansi;
 public class ConsoleLogger {
 
 	private static JavaPlugin plugin = null;
-	private static Logger logger     = null;
+	private static Logger logger = null;
 
 	private static String template;
 	private static boolean debug;
-	
+
 	private final String name;
 	private final String info;
-	
+
 	private static Set<String> listeners = new HashSet<String>();
 	private static Set<ConsoleLogger> loggers = new HashSet<ConsoleLogger>();
 
 	/**
 	 * Constructor for the ConsoleLogger.
 	 * 
-	 * @param logger_name - Name of the logger.
+	 * @param logger_name
+	 *            - Name of the logger.
 	 */
 	public ConsoleLogger(String logger_name) {
 		this.name = logger_name;
 		this.info = ConsoleLogger.template + "[" + logger_name + "] - ";
-		
+
 		loggers.add(this);
 	}
-	
+
 	/**
 	 * Returns the name of this object.
 	 * 
@@ -76,7 +77,8 @@ public class ConsoleLogger {
 	/**
 	 * Outputs normal info to the console with a green color.
 	 * 
-	 * @param msg - Info message
+	 * @param msg
+	 *            - Info message
 	 */
 	public void info(String msg) {
 		ConsoleLogger.logger.info(Ansi.ansi().fg(Ansi.Color.GREEN) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
@@ -86,7 +88,8 @@ public class ConsoleLogger {
 	/**
 	 * Outputs warnings to the console with a yellow color.
 	 * 
-	 * @param msg - Warning message
+	 * @param msg
+	 *            - Warning message
 	 */
 	public void warning(String msg) {
 		ConsoleLogger.logger.warning(Ansi.ansi().fg(Ansi.Color.YELLOW) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
@@ -96,7 +99,8 @@ public class ConsoleLogger {
 	/**
 	 * Outputs severe messages to the console with a red color.
 	 * 
-	 * @param msg - Severe message
+	 * @param msg
+	 *            - Severe message
 	 */
 	public void severe(String msg) {
 		ConsoleLogger.logger.severe(Ansi.ansi().fg(Ansi.Color.RED) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
@@ -104,10 +108,11 @@ public class ConsoleLogger {
 	}
 
 	/**
-	 * This will only output if the debug is set to true.
-	 * Outputs with a cyan color.
+	 * This will only output if the debug is set to true. Outputs with a cyan
+	 * color.
 	 * 
-	 * @param msg - Debug message
+	 * @param msg
+	 *            - Debug message
 	 */
 	public void debug(String msg) {
 		if (debug == true) {
@@ -115,12 +120,12 @@ public class ConsoleLogger {
 			broadcastToListeners("debug", msg);
 		}
 	}
-	
+
 	private void broadcastToListeners(String level, String msg) {
-		
+
 		String label = null;
-		
-		switch(level) {
+
+		switch (level) {
 			case "info":
 				label = ChatColor.GREEN + "INFO";
 				break;
@@ -136,14 +141,14 @@ public class ConsoleLogger {
 			default:
 				label = "Default label";
 		}
-			
+
 		Iterator<String> i = listeners.iterator();
-		
-		while(i.hasNext()) {
-			
+
+		while (i.hasNext()) {
+
 			Player player = plugin.getServer().getPlayerExact(i.next());
-			
-			if(player != null && player.isOnline()) {
+
+			if (player != null && player.isOnline()) {
 				player.sendMessage(label + " [" + this.name + "] - " + ChatColor.WHITE + msg);
 			}
 			else {
@@ -151,62 +156,64 @@ public class ConsoleLogger {
 			}
 		}
 	}
-	
-	
-	
-	
+
 	// ---------- Static methods ----------
-	
+
 	/**
 	 * Has to be called before any ConsoleLogger can be initialized.
 	 * 
-	 * @param instance - Plugin instance.
+	 * @param instance
+	 *            - Plugin instance.
 	 */
 	public static void init(JavaPlugin instance) {
-		ConsoleLogger.plugin   = instance;
-		ConsoleLogger.logger   = instance.getLogger();
-		ConsoleLogger.debug    = instance.getConfig().getBoolean("debug");
+		ConsoleLogger.plugin = instance;
+		ConsoleLogger.logger = instance.getLogger();
+		ConsoleLogger.debug = instance.getConfig().getBoolean("debug");
 		ConsoleLogger.template = "v" + instance.getDescription().getVersion() + ": ";
 	}
-	
+
 	/**
 	 * Set whether or not to output debug information to the console.
 	 * 
-	 * @param newstate - True to output, otherwise false.
+	 * @param newstate
+	 *            - True to output, otherwise false.
 	 */
 	public static void setDebug(boolean newstate) {
 		ConsoleLogger.debug = newstate;
 		ConsoleLogger.plugin.getConfig().set("debug", newstate);
 		ConsoleLogger.plugin.saveConfig();
 	}
-	
+
 	/**
 	 * Add a player to the list of players listening for debug info.
 	 * 
-	 * @param playername - Name of the player
+	 * @param playername
+	 *            - Name of the player
 	 */
 	public static void addListener(String playername) {
 		ConsoleLogger.listeners.add(playername);
 	}
-	
+
 	/**
 	 * Remove a listening player from the list of listeners.
 	 * 
-	 * @param playername - Name of the player to remove
+	 * @param playername
+	 *            - Name of the player to remove
 	 */
 	public static void removeListener(String playername) {
 		ConsoleLogger.listeners.remove(playername);
 	}
-	
+
 	/**
 	 * Retrieve the logger with the given name.
 	 * 
-	 * @param name - Name of the ConsoleLogger to retrieve.
+	 * @param name
+	 *            - Name of the ConsoleLogger to retrieve.
 	 * @return ConsoleLogger with given name, returns null if none was found.
 	 */
 	public static ConsoleLogger getLogger(String name) {
-		for(ConsoleLogger logger : ConsoleLogger.loggers) {
-			if(logger.getName().equals(name))
+		for (ConsoleLogger logger : ConsoleLogger.loggers) {
+			if (logger.getName().equals(name))
 				return logger;
 		}
 		return null;

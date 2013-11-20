@@ -29,101 +29,165 @@
 
 package se.lucasarnstrom.lucasutils;
 
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class Effects {
-	
+
 	/**
 	 * Spawns a tornado at the given location l.
 	 * 
-	 * @param plugin - Plugin instance that spawns the tornado.
-	 * @param location - Location to spawn the tornado.
-	 * @param direction - The direction the tornade should move in.
-	 * @param speed - How fast it moves in the given direction. Warning! A number greater than 0.3 makes it look wierd.
-	 * @param amount_of_blocks - The max amount of blocks that can exist in the tornado.
-	 * @param time - The amount of seconds the tornado should be alive.
+	 * @param plugin
+	 *            - Plugin instance that spawns the tornado.
+	 * @param location
+	 *            - Location to spawn the tornado.
+	 * @param material
+	 *            - The base material for the tornado.
+	 * @param data
+	 *            - Data for the block.
+	 * @param direction
+	 *            - The direction the tornado should move in.
+	 * @param speed
+	 *            - How fast it moves in the given direction. Warning! A number greater than 0.3 makes it look weird.
+	 * @param amount_of_blocks
+	 *            - The max amount of blocks that can exist in the tornado.
+	 * @param time
+	 *            - The amount of ticks the tornado should be alive.
 	 */
-	public static void spawnTornado(final JavaPlugin plugin, final Location location, final Vector direction, final double speed, final int amount_of_blocks, int time) {
-		
+	public static void spawnTornado(
+			final JavaPlugin plugin, 
+			final Location   location, 
+			final Material   material, 
+			final byte       data,
+			final Vector     direction, 
+			final double     speed, 
+			final int        amount_of_blocks, 
+			final long       time
+	) {
 		// Modify the direction vector using the speed argument.
-		if(direction != null) {
+		if (direction != null) {
 			direction.normalize().multiply(speed);
 		}
-		   
-	    class VortexBlock {
-	       
-	        FallingBlock entity;
-	       
-	        private float ticker_vertical   = 0.0f;
-	        private float ticker_horisontal = (float) (Math.random() * 2 * Math.PI);
-	       
-	        public VortexBlock(Location l) {
-	            entity = l.getWorld().spawnFallingBlock(l, Material.DIRT, (byte) 0);
-	        }
-	       
-	        public void setVelocity(Vector v) {
-	            entity.setVelocity(v);
-	        }
-	       
-	        public float verticalTicker() {
-	            if(ticker_vertical < 1.0f) {
-	                ticker_vertical += 0.05f;
-	            }
-	           
-	            return ticker_vertical;
-	        }
-	       
-	        public float horisontalTicker() {
-	            return (ticker_horisontal += 0.8f);
-	        }
-	    }
-	   
-	    final int id = new BukkitRunnable() {
-	       
-	        private ArrayList<VortexBlock> blocks = new ArrayList<VortexBlock>();
-	       
-	        public void run() {
-	           
-	            // Spawns 10 blocks at the time, with a maximum of 200 blocks at the same time.
-	            for(int i = 0 ; i < 10 ; i++) {
-	            	
-	            	// Remove the oldest block if the list goes over the limit.
-	                if(blocks.size() >= amount_of_blocks) {
-	                    VortexBlock vb = blocks.get(0);
-	                    vb.entity.remove();
-	                    blocks.remove(vb);
-	                }
-	                
-	                if(direction != null) {
-	                	location.add(direction);
-	                }
-	               
-	                blocks.add(new VortexBlock(location));
-	            }
-	           
-	            // Makes all of the blocks in the list spin.
-	            for(VortexBlock vb : blocks) {
-	            	
-	                double radius    = Math.sin(vb.verticalTicker()) * 2;
-	                float horisontal = vb.horisontalTicker();
-	                
-	                vb.setVelocity(new Vector(radius * Math.cos(horisontal), 0.5D, radius * Math.sin(horisontal)));
-	            }
-	        }
-	    }.runTaskTimer(plugin, 5L, 5L).getTaskId();
-	   
-	    // Stop the "tornado" after 30 "seconds".
-	    new BukkitRunnable() {
-	        public void run() {
-	            plugin.getServer().getScheduler().cancelTask(id);
-	        }
-	    }.runTaskLater(plugin, 20L * time);
+
+		class VortexBlock {
+
+			FallingBlock entity;
+
+			private float ticker_vertical = 0.0f;
+			private float ticker_horisontal = (float) (Math.random() * 2 * Math.PI);
+
+			@SuppressWarnings("deprecation")
+			public VortexBlock(Location l, Material m, byte d) {
+
+				if (l.getBlock().getType() != Material.AIR) {
+
+					Block b = l.getBlock();
+					entity = l.getWorld().spawnFallingBlock(l, b.getType(), b.getData());
+
+					if (b.getType() != Material.WATER)
+						b.setType(Material.AIR);
+				}
+				else
+					entity = l.getWorld().spawnFallingBlock(l, m, d);
+				
+				tick();
+			}
+
+			@SuppressWarnings("deprecation")
+			public VortexBlock tick() {
+				
+				double radius     = Math.sin(verticalTicker()) * 2;
+				float  horisontal = horisontalTicker();
+				
+				Vector v = new Vector(radius * Math.cos(horisontal), 0.5D, radius * Math.sin(horisontal));
+				
+				setVelocity(v);
+				
+				Block b = entity.getLocation().add(v).getBlock();
+				if(b.getType() != Material.AIR) {
+					
+					VortexBlock vb = new VortexBlock(b.getLocation(), b.getType(), b.getData());
+					
+					return vb;
+				}
+				
+				return null;
+			}
+
+			private void setVelocity(Vector v) {
+				entity.setVelocity(v);
+			}
+
+			private float verticalTicker() {
+				if (ticker_vertical < 1.0f) {
+					ticker_vertical += 0.05f;
+				}
+				return ticker_vertical;
+			}
+
+			private float horisontalTicker() {
+//				ticker_horisontal = (float) ((ticker_horisontal + 0.8f) % 2*Math.PI);
+				return (ticker_horisontal += 0.8f);
+			}
+		}
+
+		final int id = new BukkitRunnable() {
+
+			private ArrayDeque<VortexBlock> blocks = new ArrayDeque<VortexBlock>();
+
+			public void run() {
+
+				// Spawns 10 blocks at the time, with a maximum of 200 blocks at
+				// the same time.
+				for (int i = 0; i < 10; i++) {
+					if (direction != null) {
+						location.add(direction);
+					}
+					
+					checkListSize();
+					blocks.add(new VortexBlock(location, material, data));
+				}
+				
+				
+				// Make all blocks in the list spin, and pick up any blocks that get in the way.
+				ArrayDeque<VortexBlock> que = new ArrayDeque<VortexBlock>();
+
+				for (VortexBlock vb : blocks) {
+					VortexBlock temp = vb.tick();
+					if(temp != null) {
+						que.add(temp);
+					}
+				}
+				
+				for(VortexBlock vb : que) {
+					checkListSize();
+					blocks.add(vb);
+				}
+			}
+			
+			// Removes the oldest block if the list goes over the limit.
+			private void checkListSize() {
+				if (blocks.size() >= amount_of_blocks) {
+					VortexBlock vb = blocks.getFirst();
+					vb.entity.remove();
+					blocks.remove(vb);
+				}
+			}
+			
+		}.runTaskTimer(plugin, 5L, 5L).getTaskId();
+
+		// Stop the "tornado" after the given time.
+		new BukkitRunnable() {
+			public void run() {
+				plugin.getServer().getScheduler().cancelTask(id);
+			}
+		}.runTaskLater(plugin, time);
 	}
 }
