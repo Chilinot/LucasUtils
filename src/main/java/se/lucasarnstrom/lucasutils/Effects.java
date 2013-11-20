@@ -30,11 +30,14 @@
 package se.lucasarnstrom.lucasutils;
 
 import java.util.ArrayDeque;
+import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -60,6 +63,8 @@ public class Effects {
 	 *            - The max amount of blocks that can exist in the tornado.
 	 * @param time
 	 *            - The amount of ticks the tornado should be alive.
+	 * @param spew
+	 *            - Defines if the tornado should remove or throw out any block it picks up.
 	 */
 	public static void spawnTornado(
 			final JavaPlugin plugin, 
@@ -69,7 +74,8 @@ public class Effects {
 			final Vector     direction, 
 			final double     speed, 
 			final int        amount_of_blocks, 
-			final long       time
+			final long       time,
+			final boolean    spew
 	) {
 		// Modify the direction vector using the speed argument.
 		if (direction != null) {
@@ -78,7 +84,9 @@ public class Effects {
 
 		class VortexBlock {
 
-			FallingBlock entity;
+			Entity entity;
+			
+			private boolean removable = true;
 
 			private float ticker_vertical = 0.0f;
 			private float ticker_horisontal = (float) (Math.random() * 2 * Math.PI);
@@ -93,11 +101,32 @@ public class Effects {
 
 					if (b.getType() != Material.WATER)
 						b.setType(Material.AIR);
+					
+					removable = false;
 				}
 				else
 					entity = l.getWorld().spawnFallingBlock(l, m, d);
 				
+				addMetadata();
 				tick();
+			}
+			
+			public VortexBlock(Entity e) {
+				entity    = e;
+				removable = false;
+				addMetadata();
+				tick();
+			}
+			
+			private void addMetadata() {
+				entity.setMetadata("vortex", new FixedMetadataValue(plugin, "protected"));
+			}
+			
+			public void remove() {
+				if(removable || (!spew && (entity instanceof FallingBlock))) {
+					entity.remove();
+				}
+				entity.removeMetadata("vortex", plugin);
 			}
 
 			@SuppressWarnings("deprecation")
@@ -110,12 +139,18 @@ public class Effects {
 				
 				setVelocity(v);
 				
+				// Pick up blocks
 				Block b = entity.getLocation().add(v).getBlock();
 				if(b.getType() != Material.AIR) {
-					
-					VortexBlock vb = new VortexBlock(b.getLocation(), b.getType(), b.getData());
-					
-					return vb;
+					return new VortexBlock(b.getLocation(), b.getType(), b.getData());
+				}
+				
+				// Pick up other entities
+				List<Entity> entities = entity.getNearbyEntities(1.0D, 1.0D, 1.0D);
+				for(Entity e : entities) {
+					if(!e.hasMetadata("vortex")) {
+						return new VortexBlock(e);
+					}
 				}
 				
 				return null;
@@ -176,7 +211,7 @@ public class Effects {
 			private void checkListSize() {
 				if (blocks.size() >= amount_of_blocks) {
 					VortexBlock vb = blocks.getFirst();
-					vb.entity.remove();
+					vb.remove();
 					blocks.remove(vb);
 				}
 			}
