@@ -183,8 +183,7 @@ public class Effects {
 					location.add(direction);
 				}
 
-				// Spawns 10 blocks at the time, with a maximum of 200 blocks at
-				// the same time.
+				// Spawns 10 blocks at the time.
 				for (int i = 0; i < 10; i++) {
 					checkListSize();
 					blocks.add(new VortexBlock(location, material, data));
@@ -209,7 +208,7 @@ public class Effects {
 			
 			// Removes the oldest block if the list goes over the limit.
 			private void checkListSize() {
-				if (blocks.size() >= amount_of_blocks) {
+				while(blocks.size() >= amount_of_blocks) {
 					VortexBlock vb = blocks.getFirst();
 					vb.remove();
 					blocks.remove(vb);
