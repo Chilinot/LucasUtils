@@ -178,14 +178,14 @@ public class Effects {
 			private ArrayDeque<VortexBlock> blocks = new ArrayDeque<VortexBlock>();
 
 			public void run() {
+				
+				if (direction != null) {
+					location.add(direction);
+				}
 
 				// Spawns 10 blocks at the time, with a maximum of 200 blocks at
 				// the same time.
 				for (int i = 0; i < 10; i++) {
-					if (direction != null) {
-						location.add(direction);
-					}
-					
 					checkListSize();
 					blocks.add(new VortexBlock(location, material, data));
 				}
