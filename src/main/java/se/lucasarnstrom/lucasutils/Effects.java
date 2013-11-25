@@ -30,13 +30,13 @@
 package se.lucasarnstrom.lucasutils;
 
 import java.util.ArrayDeque;
+import java.util.HashSet;
 import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.FallingBlock;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -65,6 +65,8 @@ public class Effects {
 	 *            - The amount of ticks the tornado should be alive.
 	 * @param spew
 	 *            - Defines if the tornado should remove or throw out any block it picks up.
+	 * @param explode
+	 *            - This defines if the tornado should "explode" when it dies. Warning! Right now it only creates a huge mess.
 	 */
 	public static void spawnTornado(
 			final JavaPlugin plugin, 
@@ -75,24 +77,21 @@ public class Effects {
 			final double     speed, 
 			final int        amount_of_blocks, 
 			final long       time,
-			final boolean    spew
+			final boolean    spew,
+			final boolean    explode
 	) {
-		// Modify the direction vector using the speed argument.
-		if (direction != null) {
-			direction.normalize().multiply(speed);
-		}
-
+		
 		class VortexBlock {
 
-			Entity entity;
+			private Entity entity;
 			
-			private boolean removable = true;
+			public boolean removable = true;
 
 			private float ticker_vertical = 0.0f;
 			private float ticker_horisontal = (float) (Math.random() * 2 * Math.PI);
 
 			@SuppressWarnings("deprecation")
-			public VortexBlock(Location l, Material m, byte d) {
+			public VortexBlock(Location l, Material m, byte d, boolean explode) {
 
 				if (l.getBlock().getType() != Material.AIR) {
 
@@ -102,10 +101,12 @@ public class Effects {
 					if (b.getType() != Material.WATER)
 						b.setType(Material.AIR);
 					
-					removable = false;
+					removable = !spew;
 				}
-				else
+				else {
 					entity = l.getWorld().spawnFallingBlock(l, m, d);
+					removable = !explode;
+				}
 				
 				addMetadata();
 				tick();
@@ -113,7 +114,7 @@ public class Effects {
 			
 			public VortexBlock(Entity e) {
 				entity    = e;
-				removable = false;
+				removable = !spew;
 				addMetadata();
 				tick();
 			}
@@ -123,7 +124,7 @@ public class Effects {
 			}
 			
 			public void remove() {
-				if(removable || (!spew && (entity instanceof FallingBlock))) {
+				if(removable) {
 					entity.remove();
 				}
 				entity.removeMetadata("vortex", plugin);
@@ -142,7 +143,7 @@ public class Effects {
 				// Pick up blocks
 				Block b = entity.getLocation().add(v).getBlock();
 				if(b.getType() != Material.AIR) {
-					return new VortexBlock(b.getLocation(), b.getType(), b.getData());
+					return new VortexBlock(b.getLocation(), b.getType(), b.getData(), explode);
 				}
 				
 				// Pick up other entities
@@ -172,7 +173,15 @@ public class Effects {
 				return (ticker_horisontal += 0.8f);
 			}
 		}
-
+		
+		// Modify the direction vector using the speed argument.
+		if (direction != null) {
+			direction.normalize().multiply(speed);
+		}
+		
+		// This set will contain every block created to make sure the metadata for each and everyone is removed.
+		final HashSet<VortexBlock> clear = new HashSet<VortexBlock>();
+		
 		final int id = new BukkitRunnable() {
 
 			private ArrayDeque<VortexBlock> blocks = new ArrayDeque<VortexBlock>();
@@ -186,7 +195,9 @@ public class Effects {
 				// Spawns 10 blocks at the time.
 				for (int i = 0; i < 10; i++) {
 					checkListSize();
-					blocks.add(new VortexBlock(location, material, data));
+					VortexBlock vb = new VortexBlock(location, material, data, explode);
+					blocks.add(vb);
+					clear.add(vb);
 				}
 				
 				
@@ -203,6 +214,7 @@ public class Effects {
 				for(VortexBlock vb : que) {
 					checkListSize();
 					blocks.add(vb);
+					clear.add(vb);
 				}
 			}
 			
@@ -212,14 +224,17 @@ public class Effects {
 					VortexBlock vb = blocks.getFirst();
 					vb.remove();
 					blocks.remove(vb);
+					clear.remove(vb);
 				}
 			}
-			
 		}.runTaskTimer(plugin, 5L, 5L).getTaskId();
 
 		// Stop the "tornado" after the given time.
 		new BukkitRunnable() {
 			public void run() {
+				for(VortexBlock vb : clear) {
+					vb.remove();
+				}
 				plugin.getServer().getScheduler().cancelTask(id);
 			}
 		}.runTaskLater(plugin, time);
