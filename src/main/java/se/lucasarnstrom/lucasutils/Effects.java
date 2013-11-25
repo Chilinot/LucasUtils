@@ -109,14 +109,12 @@ public class Effects {
 				}
 				
 				addMetadata();
-				tick();
 			}
 			
 			public VortexBlock(Entity e) {
 				entity    = e;
 				removable = false;
 				addMetadata();
-				tick();
 			}
 			
 			private void addMetadata() {
