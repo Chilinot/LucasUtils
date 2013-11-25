@@ -91,7 +91,7 @@ public class Effects {
 			private float ticker_horisontal = (float) (Math.random() * 2 * Math.PI);
 
 			@SuppressWarnings("deprecation")
-			public VortexBlock(Location l, Material m, byte d, boolean explode) {
+			public VortexBlock(Location l, Material m, byte d) {
 
 				if (l.getBlock().getType() != Material.AIR) {
 
@@ -114,7 +114,7 @@ public class Effects {
 			
 			public VortexBlock(Entity e) {
 				entity    = e;
-				removable = !spew;
+				removable = false;
 				addMetadata();
 				tick();
 			}
@@ -131,30 +131,32 @@ public class Effects {
 			}
 
 			@SuppressWarnings("deprecation")
-			public VortexBlock tick() {
+			public HashSet<VortexBlock> tick() {
 				
 				double radius     = Math.sin(verticalTicker()) * 2;
 				float  horisontal = horisontalTicker();
 				
 				Vector v = new Vector(radius * Math.cos(horisontal), 0.5D, radius * Math.sin(horisontal));
 				
-				setVelocity(v);
+				HashSet<VortexBlock> new_blocks = new HashSet<VortexBlock>();
 				
 				// Pick up blocks
 				Block b = entity.getLocation().add(v).getBlock();
 				if(b.getType() != Material.AIR) {
-					return new VortexBlock(b.getLocation(), b.getType(), b.getData(), explode);
+					new_blocks.add(new VortexBlock(b.getLocation(), b.getType(), b.getData()));
 				}
 				
 				// Pick up other entities
 				List<Entity> entities = entity.getNearbyEntities(1.0D, 1.0D, 1.0D);
 				for(Entity e : entities) {
 					if(!e.hasMetadata("vortex")) {
-						return new VortexBlock(e);
+						new_blocks.add(new VortexBlock(e));
 					}
 				}
 				
-				return null;
+				setVelocity(v);
+				
+				return new_blocks;
 			}
 
 			private void setVelocity(Vector v) {
@@ -195,22 +197,22 @@ public class Effects {
 				// Spawns 10 blocks at the time.
 				for (int i = 0; i < 10; i++) {
 					checkListSize();
-					VortexBlock vb = new VortexBlock(location, material, data, explode);
+					VortexBlock vb = new VortexBlock(location, material, data);
 					blocks.add(vb);
 					clear.add(vb);
 				}
-				
 				
 				// Make all blocks in the list spin, and pick up any blocks that get in the way.
 				ArrayDeque<VortexBlock> que = new ArrayDeque<VortexBlock>();
 
 				for (VortexBlock vb : blocks) {
-					VortexBlock temp = vb.tick();
-					if(temp != null) {
+					HashSet<VortexBlock> new_blocks = vb.tick();
+					for(VortexBlock temp : new_blocks) {
 						que.add(temp);
 					}
 				}
 				
+				// Add the new blocks
 				for(VortexBlock vb : que) {
 					checkListSize();
 					blocks.add(vb);
