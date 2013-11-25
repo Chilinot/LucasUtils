@@ -30,6 +30,7 @@
 package se.lucasarnstrom.lucasutils;
 
 import java.util.ArrayDeque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -43,6 +44,21 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 public class Effects {
+	
+	private final static HashMap<Integer, Double[]> lookup = new HashMap<Integer, Double[]>();
+	
+	private static void generateLookup() {
+		if(lookup.size() != 0) {
+			return;
+		}
+		
+		for(int i = 0 ; i < 360 ; i++) {
+			Double[] data = new Double[2];
+			data[0] = Math.sin(Math.toRadians(i));
+			data[1] = Math.cos(Math.toRadians(i));
+			lookup.put(i, data);
+		}
+	}
 
 	/**
 	 * Spawns a tornado at the given location l.
@@ -81,14 +97,16 @@ public class Effects {
 			final boolean    explode
 	) {
 		
+		generateLookup();
+		
 		class VortexBlock {
 
 			private Entity entity;
 			
 			public boolean removable = true;
 
-			private float ticker_vertical = 0.0f;
-			private float ticker_horisontal = (float) (Math.random() * 2 * Math.PI);
+			private int ticker_vertical   = 0;
+			private int ticker_horisontal = (int) Math.round((Math.random() * 360));
 
 			@SuppressWarnings("deprecation")
 			public VortexBlock(Location l, Material m, byte d) {
@@ -131,10 +149,10 @@ public class Effects {
 			@SuppressWarnings("deprecation")
 			public HashSet<VortexBlock> tick() {
 				
-				double radius     = Math.sin(verticalTicker()) * 2;
-				float  horisontal = horisontalTicker();
+				double radius     = lookup.get(verticalTicker())[0] * 2;
+				int    horisontal = horisontalTicker();
 				
-				Vector v = new Vector(radius * Math.cos(horisontal), 0.5D, radius * Math.sin(horisontal));
+				Vector v = new Vector(radius * lookup.get(horisontal)[1], 0.5D, radius * lookup.get(horisontal)[0]);
 				
 				HashSet<VortexBlock> new_blocks = new HashSet<VortexBlock>();
 				
@@ -161,16 +179,16 @@ public class Effects {
 				entity.setVelocity(v);
 			}
 
-			private float verticalTicker() {
-				if (ticker_vertical < 1.0f) {
-					ticker_vertical += 0.05f;
+			private int verticalTicker() {
+				if (ticker_vertical < 90) {
+					ticker_vertical += 5;
 				}
 				return ticker_vertical;
 			}
 
-			private float horisontalTicker() {
-//				ticker_horisontal = (float) ((ticker_horisontal + 0.8f) % 2*Math.PI);
-				return (ticker_horisontal += 0.8f);
+			private int horisontalTicker() {
+				ticker_horisontal = (ticker_horisontal + 45) % 360;
+				return ticker_horisontal;
 			}
 		}
 		
