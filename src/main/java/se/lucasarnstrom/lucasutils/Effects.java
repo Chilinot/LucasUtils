@@ -141,7 +141,7 @@ public class Effects {
 				HashSet<VortexBlock> new_blocks = new HashSet<VortexBlock>();
 				
 				// Pick up blocks
-				Block b = entity.getLocation().add(v).getBlock();
+				Block b = entity.getLocation().add(v.clone().normalize()).getBlock();
 				if(b.getType() != Material.AIR) {
 					new_blocks.add(new VortexBlock(b.getLocation(), b.getType(), b.getData()));
 				}
