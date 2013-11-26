@@ -123,7 +123,7 @@ public class Effects {
 				}
 				else {
 					entity = l.getWorld().spawnFallingBlock(l, m, d);
-					removable = !explode;
+					removable = true;
 				}
 				
 				addMetadata();
@@ -139,8 +139,8 @@ public class Effects {
 				entity.setMetadata("vortex", new FixedMetadataValue(plugin, "protected"));
 			}
 			
-			public void remove() {
-				if(removable) {
+			public void remove(boolean explode) {
+				if(removable && !explode) {
 					entity.remove();
 				}
 				entity.removeMetadata("vortex", plugin);
@@ -240,7 +240,7 @@ public class Effects {
 			private void checkListSize() {
 				while(blocks.size() >= amount_of_blocks) {
 					VortexBlock vb = blocks.getFirst();
-					vb.remove();
+					vb.remove(false);
 					blocks.remove(vb);
 					clear.remove(vb);
 				}
@@ -251,7 +251,7 @@ public class Effects {
 		new BukkitRunnable() {
 			public void run() {
 				for(VortexBlock vb : clear) {
-					vb.remove();
+					vb.remove(explode);
 				}
 				plugin.getServer().getScheduler().cancelTask(id);
 			}
