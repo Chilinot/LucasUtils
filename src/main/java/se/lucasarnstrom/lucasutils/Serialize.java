@@ -48,13 +48,20 @@ public class Serialize {
 
 	enum SerializePatterns {
 
-		INV_POSITION(1, "([0-9]{1,2});@"),
+		INV_POSITION           (1, "([0-9]{1,2});@"),
 
-		STACK_AMOUNT(1, "@a:([0-9]{1,2})!"), STACK_TYPE(1, "t:([0-9]{1,})!"), STACK_DATA(1, "D:([0-9]{1,2})!"), STACK_DURABILITY(1, "d:([0-9]{1,2})!"), STACK_ENCHANTMENTS(1, "([0-9]{1,2}-[0-9]{1,2})\\+"), STACK_META_DISPLAYNAME(1, "mn:(\\[([0-9]*,)*\\])&"), STACK_META_LORE(1, "(\\[([0-9]*,)*\\])/"),
+		STACK_AMOUNT           (1, "@a:([0-9]{1,2})!"), 
+		STACK_TYPE             (1, "t:([0-9]{1,})!"), 
+		STACK_DATA             (1, "D:([0-9]{1,2})!"), 
+		STACK_DURABILITY       (1, "d:([0-9]{1,2})!"), 
+		STACK_ENCHANTMENTS     (1, "([0-9]{1,2}-[0-9]{1,2})\\+"), 
+		STACK_META_DISPLAYNAME (1, "mn:(\\[([0-9]*,)*\\])&"), 
+		STACK_META_LORE        (1, "(\\[([0-9]*,)*\\])/"),
 
-		ENCHANTMENT_ID(1, "(\\d{1,2})-(\\d{1,2})"), ENCHANTMENT_LEVEL(2, "(\\d{1,2})-(\\d{1,2})"),
+		ENCHANTMENT_ID         (1, "(\\d{1,2})-(\\d{1,2})"), 
+		ENCHANTMENT_LEVEL      (2, "(\\d{1,2})-(\\d{1,2})"),
 
-		ASCII(1, "([0-9]{1,3}),");
+		ASCII                  (1, "([0-9]{1,3}),");
 
 		public Pattern pattern;
 		public int groupID;
@@ -217,9 +224,9 @@ public class Serialize {
 		byte data;
 
 		try {
-			amount = Integer.parseInt(locate(SerializePatterns.STACK_AMOUNT, serial).get(0));
-			id = Integer.parseInt(locate(SerializePatterns.STACK_TYPE, serial).get(0));
-			data = Byte.parseByte(locate(SerializePatterns.STACK_DATA, serial).get(0));
+			amount     = Integer.parseInt(locate(SerializePatterns.STACK_AMOUNT,     serial).get(0));
+			id         = Integer.parseInt(locate(SerializePatterns.STACK_TYPE,       serial).get(0));
+			data       = Byte.parseByte  (locate(SerializePatterns.STACK_DATA,       serial).get(0));
 			durability = Short.parseShort(locate(SerializePatterns.STACK_DURABILITY, serial).get(0));
 		}
 		catch (NumberFormatException e) {
@@ -236,7 +243,7 @@ public class Serialize {
 			Pattern ench = Pattern.compile("(\\d{1,2})-(\\d{1,2})");
 
 			for (String s : enchantments) {
-				int ench_id = Integer.parseInt(locate(ench, 1, s).get(0));
+				int ench_id  = Integer.parseInt(locate(ench, 1, s).get(0));
 				int ench_lvl = Integer.parseInt(locate(ench, 2, s).get(0));
 
 				stack.addEnchantment(Enchantment.getById(ench_id), ench_lvl);
