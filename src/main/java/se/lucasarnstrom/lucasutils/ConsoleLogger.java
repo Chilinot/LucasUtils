@@ -1,11 +1,9 @@
 /**
- *  Name: ConsoleLogger.java
- *  Updated: 2013-06-10 - 14:44
- * 
- *  Author: LucasEmanuel @ bukkit forums
+ *  Author: Lucas Arnström
+ *  Contact: Lucasarnstrom@gmail.com
  *  
  *  
- *  Copyright 2013 Lucas Arnström
+ *  Copyright 2014 Lucas Arnström
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -41,16 +39,16 @@ import org.fusesource.jansi.Ansi;
 public class ConsoleLogger {
 
 	private static JavaPlugin plugin = null;
-	private static Logger logger = null;
+	private static Logger     logger = null;
 
-	private static String template;
-	private static boolean debug;
+	private static String     template;
+	private static boolean    debug;
 
-	private final String name;
-	private final String info;
+	private final String      name;
+	private final String      info;
 
-	private static Set<String> listeners = new HashSet<String>();
-	private static Set<ConsoleLogger> loggers = new HashSet<ConsoleLogger>();
+	private static Set<String>        listeners = new HashSet<>();
+	private static Set<ConsoleLogger> loggers   = new HashSet<>();
 
 	/**
 	 * Constructor for the ConsoleLogger.
@@ -118,6 +116,18 @@ public class ConsoleLogger {
 		if (debug == true) {
 			ConsoleLogger.logger.info(Ansi.ansi().fg(Ansi.Color.CYAN) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
 			broadcastToListeners("debug", msg);
+		}
+	}
+
+	/**
+	 * Takes an array of StackTraceElement objects and prints them using the debug function.
+	 *
+	 * @param sa
+	 *           - The stack trace to print to console.
+	 */
+	public void debug(StackTraceElement[] sa) {
+		for(StackTraceElement s : sa) {
+			debug(s.toString());
 		}
 	}
 
