@@ -30,6 +30,6 @@ public interface LanguageInterface {
     void setConfig();
 
     default public void loadDefaults(Enum e) {
-        
+
     }
 }
