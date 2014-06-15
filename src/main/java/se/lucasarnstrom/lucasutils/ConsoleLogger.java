@@ -1,9 +1,9 @@
 /**
- *  Author: Lucas Arnström
+ *  Author: Lucas ArnstrÃ¶m
  *  Contact: Lucasarnstrom@gmail.com
  *  
  *  
- *  Copyright 2014 Lucas Arnström
+ *  Copyright 2014 Lucas ArnstrÃ¶m
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ package se.lucasarnstrom.lucasutils;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -38,70 +39,70 @@ import org.fusesource.jansi.Ansi;
 
 public class ConsoleLogger {
 
-	private static JavaPlugin plugin = null;
-	private static Logger     logger = null;
+    private static JavaPlugin plugin = null;
+    private static Logger     logger = null;
 
-	private static String     template;
-	private static boolean    debug;
+    private static String  template;
+    private static boolean debug;
 
-	private final String      name;
-	private final String      info;
+    private final String name;
+    private final String info;
 
-	private static Set<String>        listeners = new HashSet<>();
-	private static Set<ConsoleLogger> loggers   = new HashSet<>();
+    private static Set<UUID>          listeners = new HashSet<>();
+    private static Set<ConsoleLogger> loggers   = new HashSet<>();
 
-	/**
-	 * Constructor for the ConsoleLogger.
-	 * 
-	 * @param logger_name
-	 *            - Name of the logger.
-	 */
-	public ConsoleLogger(String logger_name) {
-		this.name = logger_name;
-		this.info = ConsoleLogger.template + "[" + logger_name + "] - ";
+    /**
+     * Constructor for the ConsoleLogger.
+     *
+     * @param logger_name
+     *            - Name of the logger.
+     */
+    public ConsoleLogger(String logger_name) {
+        this.name = logger_name;
+        this.info = ConsoleLogger.template + "[" + logger_name + "] - ";
 
-		loggers.add(this);
-	}
+        loggers.add(this);
+    }
 
-	/**
-	 * Returns the name of this object.
-	 * 
-	 * @return name
-	 */
-	public String getName() {
-		return name;
-	}
+    /**
+     * Returns the name of this object.
+     *
+     * @return name
+     */
+    public String getName() {
+        return name;
+    }
 
-	/**
-	 * Outputs normal info to the console with a green color.
-	 * 
-	 * @param msg
-	 *            - Info message
-	 */
-	public void info(String msg) {
-		ConsoleLogger.logger.info(Ansi.ansi().fg(Ansi.Color.GREEN) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
-		broadcastToListeners("info", msg);
-	}
+    /**
+     * Outputs normal info to the console with a green color.
+     *
+     * @param msg
+     *            - Info message
+     */
+    public void info(String msg) {
+        ConsoleLogger.logger.info(Ansi.ansi().fg(Ansi.Color.GREEN) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
+        broadcastToListeners("info", msg);
+    }
 
-	/**
-	 * Outputs warnings to the console with a yellow color.
-	 * 
-	 * @param msg
-	 *            - Warning message
-	 */
-	public void warning(String msg) {
-		ConsoleLogger.logger.warning(Ansi.ansi().fg(Ansi.Color.YELLOW) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
-		broadcastToListeners("warning", msg);
-	}
+    /**
+     * Outputs warnings to the console with a yellow color.
+     *
+     * @param msg
+     *            - Warning message
+     */
+    public void warning(String msg) {
+        ConsoleLogger.logger.warning(Ansi.ansi().fg(Ansi.Color.YELLOW) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
+        broadcastToListeners("warning", msg);
+    }
 
-	/**
-	 * Outputs severe messages to the console with a red color.
-	 * 
-	 * @param msg
-	 *            - Severe message
-	 */
-	public void severe(String msg) {
-		ConsoleLogger.logger.severe(Ansi.ansi().fg(Ansi.Color.RED) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
+    /**
+     * Outputs severe messages to the console with a red color.
+     *
+     * @param msg
+     *            - Severe message
+     */
+    public void severe(String msg) {
+        ConsoleLogger.logger.severe(Ansi.ansi().fg(Ansi.Color.RED) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
 		broadcastToListeners("severe", msg);
 	}
 
@@ -152,11 +153,11 @@ public class ConsoleLogger {
 				label = "Default label";
 		}
 
-		Iterator<String> i = listeners.iterator();
+		Iterator<UUID> i = listeners.iterator();
 
 		while (i.hasNext()) {
 
-			Player player = plugin.getServer().getPlayerExact(i.next());
+			Player player = plugin.getServer().getPlayer(i.next());
 
 			if (player != null && player.isOnline()) {
 				player.sendMessage(label + " [" + this.name + "] - " + ChatColor.WHITE + msg);
@@ -197,21 +198,21 @@ public class ConsoleLogger {
 	/**
 	 * Add a player to the list of players listening for debug info.
 	 * 
-	 * @param playername
+	 * @param id
 	 *            - Name of the player
 	 */
-	public static void addListener(String playername) {
-		ConsoleLogger.listeners.add(playername);
+	public static void addListener(UUID id) {
+		ConsoleLogger.listeners.add(id);
 	}
 
 	/**
 	 * Remove a listening player from the list of listeners.
 	 * 
-	 * @param playername
+	 * @param id
 	 *            - Name of the player to remove
 	 */
-	public static void removeListener(String playername) {
-		ConsoleLogger.listeners.remove(playername);
+	public static void removeListener(UUID id) {
+		ConsoleLogger.listeners.remove(id);
 	}
 
 	/**
