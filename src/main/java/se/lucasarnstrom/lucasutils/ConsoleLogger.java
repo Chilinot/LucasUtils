@@ -43,7 +43,7 @@ public class ConsoleLogger {
     private static Logger     logger = null;
 
     private static String  template;
-    private static boolean debug;
+    private static boolean debug = false;
 
     private final String name;
     private final String info;
