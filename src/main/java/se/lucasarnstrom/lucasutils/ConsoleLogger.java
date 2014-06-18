@@ -172,7 +172,7 @@ public class ConsoleLogger {
     public static void init(JavaPlugin instance) {
         ConsoleLogger.plugin = instance;
         ConsoleLogger.logger = instance.getLogger();
-        ConsoleLogger.debug = instance.getConfig().getBoolean("debug");
+        ConsoleLogger.debug = instance.getConfig().getBoolean("debug", false);
         ConsoleLogger.template = "v" + instance.getDescription().getVersion() + ": ";
     }
 
