@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>se.lucasarnstrom</groupId>
     <artifactId>lucasutils</artifactId>
-    <version>6.1</version>
+    <version>7</version>
     <name>LucasUtils</name>
     <description>A collection of handy tools.</description>
 
