@@ -78,9 +78,7 @@ public class ConsoleLogger {
      * @param msg - Info message
      */
     public void info(String msg) {
-        if(ConsoleLogger.logger != null) {
-            ConsoleLogger.logger.info(Ansi.ansi().fg(Ansi.Color.GREEN) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
-        }
+        ConsoleLogger.logger.info(Ansi.ansi().fg(Ansi.Color.GREEN) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
         broadcastToListeners("info", msg);
     }
 
@@ -90,9 +88,7 @@ public class ConsoleLogger {
      * @param msg - Warning message
      */
     public void warning(String msg) {
-        if(ConsoleLogger.logger != null) {
-            ConsoleLogger.logger.warning(Ansi.ansi().fg(Ansi.Color.YELLOW) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
-        }
+        ConsoleLogger.logger.warning(Ansi.ansi().fg(Ansi.Color.YELLOW) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
         broadcastToListeners("warning", msg);
     }
 
@@ -102,9 +98,7 @@ public class ConsoleLogger {
      * @param msg - Severe message
      */
     public void severe(String msg) {
-        if(ConsoleLogger.logger != null) {
-            ConsoleLogger.logger.severe(Ansi.ansi().fg(Ansi.Color.RED) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
-        }
+        ConsoleLogger.logger.severe(Ansi.ansi().fg(Ansi.Color.RED) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
         broadcastToListeners("severe", msg);
     }
 
@@ -133,12 +127,6 @@ public class ConsoleLogger {
     }
 
     private void broadcastToListeners(String level, String msg) {
-
-        if(ConsoleLogger.plugin == null) {
-            System.out.println(Ansi.ansi().fg(Ansi.Color.RED)
-                    + "CONSOLELOGGER HAS NOT BEEN INITIATED WITH PLUGIN INSTANCE!"
-                    + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
-        }
 
         String label = null;
 
