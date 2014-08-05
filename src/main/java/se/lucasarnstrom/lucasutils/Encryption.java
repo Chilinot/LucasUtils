@@ -41,7 +41,7 @@ public class Encryption {
      * @param input          - String to encrypt.
      * @return - Encrypted string, null if failed to encrypt.
      */
-    public String encrypt(String input {
+    public String encrypt(String input) {
         byte[] crypted = null;
 
         try {
