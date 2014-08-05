@@ -28,23 +28,24 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Encryption {
 
     private ConsoleLogger logger;
+    private final String ENCRYPTION_KEY;
 
-    public Encryption(JavaPlugin plugin) {
+    public Encryption(JavaPlugin plugin, String encryption_key) {
         logger = new ConsoleLogger(plugin.getName() + "-Encryption");
+        ENCRYPTION_KEY = encryption_key;
     }
 
     /**
      * Encrypts string with AES using the given key.
      *
      * @param input          - String to encrypt.
-     * @param encryption_key - Encryption key.
      * @return - Encrypted string, null if failed to encrypt.
      */
-    public String encrypt(String input, String encryption_key) {
+    public String encrypt(String input {
         byte[] crypted = null;
 
         try {
-            SecretKeySpec skey = new SecretKeySpec(encryption_key.getBytes(), "AES");
+            SecretKeySpec skey = new SecretKeySpec(ENCRYPTION_KEY.getBytes(), "AES");
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, skey);
             crypted = cipher.doFinal(input.getBytes());
