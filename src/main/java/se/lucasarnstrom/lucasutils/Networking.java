@@ -20,6 +20,8 @@
  */
 package se.lucasarnstrom.lucasutils;
 
+import org.bukkit.plugin.java.JavaPlugin;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -31,10 +33,10 @@ import java.util.Map;
 
 public class Networking {
 
-    private static ConsoleLogger logger = null;
+    private ConsoleLogger logger;
 
-    public static void setLogger(ConsoleLogger l) {
-        Networking.logger = l;
+    public Networking(JavaPlugin plugin) {
+        logger = new ConsoleLogger(plugin.getName() + "-Networking");
     }
 
     /**
@@ -44,7 +46,7 @@ public class Networking {
      * @param data      - A map with the data to send.
      * @return - Answer from the webserver, null if failed.
      */
-    public static String sendWebPost(String urlString, Map<String, String> data) {
+    public String sendWebPost(String urlString, Map<String, String> data) {
         String answer = null;
 
         try {

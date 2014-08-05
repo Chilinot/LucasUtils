@@ -23,8 +23,15 @@ package se.lucasarnstrom.lucasutils;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Base64;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class Encryption {
+
+    private ConsoleLogger logger;
+
+    public Encryption(JavaPlugin plugin) {
+        logger = new ConsoleLogger(plugin.getName() + "-Encryption");
+    }
 
     /**
      * Encrypts string with AES using the given key.
@@ -33,7 +40,7 @@ public class Encryption {
      * @param encryption_key - Encryption key.
      * @return - Encrypted string, null if failed to encrypt.
      */
-    public static String encrypt(String input, String encryption_key) {
+    public String encrypt(String input, String encryption_key) {
         byte[] crypted = null;
 
         try {
@@ -43,7 +50,8 @@ public class Encryption {
             crypted = cipher.doFinal(input.getBytes());
         }
         catch(Exception e) {
-            e.printStackTrace();
+            logger.severe(e.getMessage());
+            logger.debug(e.getStackTrace());
         }
 
         return crypted == null ? null : new String(Base64.encodeBase64(crypted));
