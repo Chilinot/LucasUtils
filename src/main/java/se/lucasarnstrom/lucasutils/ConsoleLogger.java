@@ -170,10 +170,7 @@ public class ConsoleLogger {
     private void broadcastToListeners(LogLevel level, String msg) {
 
         if(ConsoleLogger.plugin == null) {
-            System.out.println(Ansi.ansi().fg(Ansi.Color.RED)
-                    + "CONSOLELOGGER HAS NOT BEEN INITIATED WITH PLUGIN INSTANCE!"
-                    + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
-
+            System.out.println(colorizeLevel(LogLevel.SEVERE, "CONSOLELOGGER HAS NOT BEEN INITIATED WITH PLUGIN INSTANCE!"));
             return;
         }
 
