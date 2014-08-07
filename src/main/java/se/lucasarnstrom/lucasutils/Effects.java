@@ -60,16 +60,16 @@ public class Effects {
      * @param explode          - This defines if the tornado should "explode" when it dies. Warning! Right now it only creates a huge mess.
      */
     public static void spawnTornado(
-                                           final JavaPlugin plugin,
-                                           final Location location,
-                                           final Material material,
-                                           final byte data,
-                                           final Vector direction,
-                                           final double speed,
-                                           final int amount_of_blocks,
-                                           final long time,
-                                           final boolean spew,
-                                           final boolean explode
+           final JavaPlugin plugin,
+           final Location location,
+           final Material material,
+           final byte data,
+           final Vector direction,
+           final double speed,
+           final int amount_of_blocks,
+           final long time,
+           final boolean spew,
+           final boolean explode
     ) {
 
         class VortexBlock {
