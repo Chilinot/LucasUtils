@@ -173,6 +173,8 @@ public class ConsoleLogger {
             System.out.println(Ansi.ansi().fg(Ansi.Color.RED)
                     + "CONSOLELOGGER HAS NOT BEEN INITIATED WITH PLUGIN INSTANCE!"
                     + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
+
+            return;
         }
 
         String label = null;
