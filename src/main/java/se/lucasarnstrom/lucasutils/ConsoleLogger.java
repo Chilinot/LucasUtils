@@ -83,7 +83,7 @@ public class ConsoleLogger {
      */
     public void info(String msg) {
         if(ConsoleLogger.logger != null) {
-            ConsoleLogger.logger.info(Ansi.ansi().fg(Ansi.Color.GREEN) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
+            ConsoleLogger.logger.info(colorizeLevel(LogLevel.INFO, msg));
         }
         broadcastToListeners(LogLevel.INFO, msg);
     }
@@ -95,7 +95,7 @@ public class ConsoleLogger {
      */
     public void warning(String msg) {
         if(ConsoleLogger.logger != null) {
-            ConsoleLogger.logger.warning(Ansi.ansi().fg(Ansi.Color.YELLOW) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
+            ConsoleLogger.logger.warning(colorizeLevel(LogLevel.WARNING, msg));
         }
         broadcastToListeners(LogLevel.WARNING, msg);
     }
@@ -107,7 +107,7 @@ public class ConsoleLogger {
      */
     public void severe(String msg) {
         if(ConsoleLogger.logger != null) {
-            ConsoleLogger.logger.severe(Ansi.ansi().fg(Ansi.Color.RED) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
+            ConsoleLogger.logger.severe(colorizeLevel(LogLevel.SEVERE, msg));
         }
         broadcastToListeners(LogLevel.SEVERE, msg);
     }
@@ -120,7 +120,7 @@ public class ConsoleLogger {
      */
     public void debug(String msg) {
         if(debug == true) {
-            ConsoleLogger.logger.info(Ansi.ansi().fg(Ansi.Color.CYAN) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
+            ConsoleLogger.logger.info(colorizeLevel(LogLevel.DEBUG, msg));
             broadcastToListeners(LogLevel.DEBUG, msg);
         }
     }
@@ -134,6 +134,37 @@ public class ConsoleLogger {
         for(StackTraceElement s : sa) {
             debug(s.toString());
         }
+    }
+
+    private String colorizeLevel(LogLevel level, String msg) {
+        StringBuilder sb = new StringBuilder();
+
+        switch(level) {
+            case INFO:
+                sb.append(Ansi.ansi().fg(Ansi.Color.GREEN));
+                break;
+
+            case WARNING:
+                sb.append(Ansi.ansi().fg(Ansi.Color.YELLOW));
+                break;
+
+            case SEVERE:
+                sb.append(Ansi.ansi().fg(Ansi.Color.RED));
+                break;
+
+            case DEBUG:
+                sb.append(Ansi.ansi().fg(Ansi.Color.CYAN));
+                break;
+
+            default:
+                // Nothing
+        }
+
+        sb.append(this.info);
+        sb.append(msg);
+        sb.append(Ansi.ansi().fg(Ansi.Color.WHITE));
+
+        return sb.toString();
     }
 
     private void broadcastToListeners(LogLevel level, String msg) {
