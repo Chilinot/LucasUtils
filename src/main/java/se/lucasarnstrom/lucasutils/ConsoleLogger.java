@@ -39,6 +39,10 @@ import java.util.logging.Logger;
 
 public class ConsoleLogger {
 
+    enum LogLevel {
+        INFO, WARNING, SEVERE, DEBUG;
+    }
+
     private static JavaPlugin plugin = null;
     private static Logger     logger = null;
 
@@ -48,8 +52,8 @@ public class ConsoleLogger {
     private final String name;
     private final String info;
 
-    private static Set<UUID>          listeners = new HashSet<>();
-    private static Set<ConsoleLogger> loggers   = new HashSet<>();
+    private static Set<UUID>          listeners = new HashSet<UUID>();
+    private static Set<ConsoleLogger> loggers   = new HashSet<ConsoleLogger>();
 
     /**
      * Constructor for the ConsoleLogger.
@@ -81,7 +85,7 @@ public class ConsoleLogger {
         if(ConsoleLogger.logger != null) {
             ConsoleLogger.logger.info(Ansi.ansi().fg(Ansi.Color.GREEN) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
-        broadcastToListeners("info", msg);
+        broadcastToListeners(LogLevel.INFO, msg);
     }
 
     /**
@@ -93,7 +97,7 @@ public class ConsoleLogger {
         if(ConsoleLogger.logger != null) {
             ConsoleLogger.logger.warning(Ansi.ansi().fg(Ansi.Color.YELLOW) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
-        broadcastToListeners("warning", msg);
+        broadcastToListeners(LogLevel.WARNING, msg);
     }
 
     /**
@@ -105,7 +109,7 @@ public class ConsoleLogger {
         if(ConsoleLogger.logger != null) {
             ConsoleLogger.logger.severe(Ansi.ansi().fg(Ansi.Color.RED) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
         }
-        broadcastToListeners("severe", msg);
+        broadcastToListeners(LogLevel.SEVERE, msg);
     }
 
     /**
@@ -117,7 +121,7 @@ public class ConsoleLogger {
     public void debug(String msg) {
         if(debug == true) {
             ConsoleLogger.logger.info(Ansi.ansi().fg(Ansi.Color.CYAN) + this.info + msg + Ansi.ansi().fg(Ansi.Color.WHITE));
-            broadcastToListeners("debug", msg);
+            broadcastToListeners(LogLevel.DEBUG, msg);
         }
     }
 
@@ -132,7 +136,7 @@ public class ConsoleLogger {
         }
     }
 
-    private void broadcastToListeners(String level, String msg) {
+    private void broadcastToListeners(LogLevel level, String msg) {
 
         if(ConsoleLogger.plugin == null) {
             System.out.println(Ansi.ansi().fg(Ansi.Color.RED)
@@ -143,16 +147,16 @@ public class ConsoleLogger {
         String label = null;
 
         switch(level) {
-            case "info":
+            case INFO:
                 label = ChatColor.GREEN + "INFO";
                 break;
-            case "warning":
+            case WARNING:
                 label = ChatColor.YELLOW + "WARNING";
                 break;
-            case "severe":
+            case SEVERE:
                 label = ChatColor.DARK_RED + "SEVERE";
                 break;
-            case "debug":
+            case DEBUG:
                 label = ChatColor.BLUE + "DEBUG";
                 break;
             default:
