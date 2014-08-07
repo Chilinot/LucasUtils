@@ -45,21 +45,6 @@ import java.util.List;
 
 public class Effects {
 
-    private final static HashMap<Integer, Double[]> lookup = new HashMap<Integer, Double[]>();
-
-    private static void generateLookup() {
-        if(lookup.size() != 0) {
-            return;
-        }
-
-        for(int i = 0; i < 360; i++) {
-            Double[] data = new Double[2];
-            data[0] = Math.sin(Math.toRadians(i));
-            data[1] = Math.cos(Math.toRadians(i));
-            lookup.put(i, data);
-        }
-    }
-
     /**
      * Spawns a tornado at the given location l.
      *
@@ -86,8 +71,6 @@ public class Effects {
                                            final boolean spew,
                                            final boolean explode
     ) {
-
-        generateLookup();
 
         class VortexBlock {
 
@@ -139,10 +122,10 @@ public class Effects {
             @SuppressWarnings("deprecation")
             public HashSet<VortexBlock> tick() {
 
-                double radius = lookup.get(verticalTicker())[0] * 2;
+                double radius = MathUtils.lookuptable.get(verticalTicker())[0] * 2;
                 int horisontal = horisontalTicker();
 
-                Vector v = new Vector(radius * lookup.get(horisontal)[1], 0.5D, radius * lookup.get(horisontal)[0]);
+                Vector v = new Vector(radius * MathUtils.lookuptable.get(horisontal)[1], 0.5D, radius * MathUtils.lookuptable.get(horisontal)[0]);
 
                 HashSet<VortexBlock> new_blocks = new HashSet<VortexBlock>();
 
