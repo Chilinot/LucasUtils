@@ -174,33 +174,38 @@ public class ConsoleLogger {
             return;
         }
 
-        String label = null;
+        StringBuilder label = new StringBuilder();
 
         switch(level) {
             case INFO:
-                label = ChatColor.GREEN + "INFO";
+                label.append(ChatColor.GREEN + "INFO");
                 break;
             case WARNING:
-                label = ChatColor.YELLOW + "WARNING";
+                label.append(ChatColor.YELLOW + "WARNING");
                 break;
             case SEVERE:
-                label = ChatColor.DARK_RED + "SEVERE";
+                label.append(ChatColor.DARK_RED + "SEVERE");
                 break;
             case DEBUG:
-                label = ChatColor.BLUE + "DEBUG";
+                label.append(ChatColor.BLUE + "DEBUG");
                 break;
             default:
-                label = "Default label";
+                label.append("Default label");
         }
 
+        label.append(" [");
+        label.append(this.name);
+        label.append("] - ");
+        label.append(ChatColor.WHITE);
+        label.append(msg);
+
+        String message = label.toString();
+
         Iterator<UUID> i = listeners.iterator();
-
         while(i.hasNext()) {
-
             Player player = plugin.getServer().getPlayer(i.next());
-
-            if(player != null && player.isOnline()) {
-                player.sendMessage(label + " [" + this.name + "] - " + ChatColor.WHITE + msg);
+            if(player != null && player.isOnline()) { // server.getPlayer(UUID) will only return online players, player.isOnline() is only there as failsafe if that would change.
+                player.sendMessage(message);
             }
             else {
                 i.remove();
