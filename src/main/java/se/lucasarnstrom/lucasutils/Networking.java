@@ -86,12 +86,10 @@ public class Networking {
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
             answer = in.readLine();
 
-            if(logger != null) {
-                String debug = answer;
-                while(debug != null) {
-                    logger.debug("POST-Recieve:" + debug);
-                    debug = in.readLine();
-                }
+            String debug = answer;
+            while(debug != null) {
+                logger.debug("POST-Recieve:" + debug);
+                debug = in.readLine();
             }
 
             in.close();
