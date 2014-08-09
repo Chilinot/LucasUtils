@@ -223,8 +223,15 @@ public class ConsoleLogger {
     public static void init(JavaPlugin instance) {
         ConsoleLogger.plugin = instance;
         ConsoleLogger.logger = instance.getLogger();
-        ConsoleLogger.debug = instance.getConfig().getBoolean("debug", false);
         ConsoleLogger.template = "v" + instance.getDescription().getVersion() + ": ";
+
+        // the config.get() methods are case sensitive, and we need to make sure we get the debug value if there is one
+        for(String key : instance.getConfig().getKeys(false)) {
+            if(key.equalsIgnoreCase("debug")) {
+                ConsoleLogger.debug = instance.getConfig().getBoolean(key);
+                break;
+            }
+        }
     }
 
     /**
