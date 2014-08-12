@@ -40,7 +40,7 @@ import java.util.logging.Logger;
 public class ConsoleLogger {
 
     enum LogLevel {
-        INFO, WARNING, SEVERE, DEBUG;
+        INFO, WARNING, SEVERE, DEBUG
     }
 
     private static JavaPlugin plugin = null;
@@ -82,10 +82,13 @@ public class ConsoleLogger {
      * @param msg - Info message
      */
     public void info(String msg) {
-        if(ConsoleLogger.logger != null) {
+        if(isInitiated()) {
             ConsoleLogger.logger.info(colorizeLevel(LogLevel.INFO, msg));
+            broadcastToListeners(LogLevel.INFO, msg);
         }
-        broadcastToListeners(LogLevel.INFO, msg);
+        else {
+            errorNotInitiated();
+        }
     }
 
     /**
@@ -94,10 +97,13 @@ public class ConsoleLogger {
      * @param msg - Warning message
      */
     public void warning(String msg) {
-        if(ConsoleLogger.logger != null) {
+        if(isInitiated()) {
             ConsoleLogger.logger.warning(colorizeLevel(LogLevel.WARNING, msg));
+            broadcastToListeners(LogLevel.WARNING, msg);
         }
-        broadcastToListeners(LogLevel.WARNING, msg);
+        else {
+            errorNotInitiated();
+        }
     }
 
     /**
@@ -106,10 +112,13 @@ public class ConsoleLogger {
      * @param msg - Severe message
      */
     public void severe(String msg) {
-        if(ConsoleLogger.logger != null) {
+        if(isInitiated()) {
             ConsoleLogger.logger.severe(colorizeLevel(LogLevel.SEVERE, msg));
+            broadcastToListeners(LogLevel.SEVERE, msg);
         }
-        broadcastToListeners(LogLevel.SEVERE, msg);
+        else {
+            errorNotInitiated();
+        }
     }
 
     /**
@@ -119,7 +128,7 @@ public class ConsoleLogger {
      * @param msg - Debug message
      */
     public void debug(String msg) {
-        if(debug == true) {
+        if(debug) {
             ConsoleLogger.logger.info(colorizeLevel(LogLevel.DEBUG, msg));
             broadcastToListeners(LogLevel.DEBUG, msg);
         }
@@ -134,6 +143,19 @@ public class ConsoleLogger {
         for(StackTraceElement s : sa) {
             debug(s.toString());
         }
+    }
+
+    /**
+     * Outputs true if the init() method has been called.
+     *
+     * @return true if init() has been called
+     */
+    public boolean isInitiated() {
+        return ConsoleLogger.logger != null && ConsoleLogger.plugin != null;
+    }
+
+    private void errorNotInitiated() {
+        System.out.println(colorizeLevel(LogLevel.SEVERE, "ConsoleLogger has not been initiated!"));
     }
 
     private String colorizeLevel(LogLevel level, String msg) {
@@ -178,21 +200,22 @@ public class ConsoleLogger {
 
         switch(level) {
             case INFO:
-                label.append(ChatColor.GREEN + "INFO");
+                label.append(ChatColor.GREEN);
                 break;
             case WARNING:
-                label.append(ChatColor.YELLOW + "WARNING");
+                label.append(ChatColor.YELLOW);
                 break;
             case SEVERE:
-                label.append(ChatColor.DARK_RED + "SEVERE");
+                label.append(ChatColor.DARK_RED);
                 break;
             case DEBUG:
-                label.append(ChatColor.BLUE + "DEBUG");
+                label.append(ChatColor.BLUE);
                 break;
             default:
-                label.append("Default label");
+                // Nothing
         }
 
+        label.append(level.name());
         label.append(" [");
         label.append(this.name);
         label.append("] - ");
