@@ -242,19 +242,13 @@ public class ConsoleLogger {
      * Has to be called before any ConsoleLogger can be initialized.
      *
      * @param instance - Plugin instance.
+     * @param debug_key - The key to the debug value in the config.
      */
-    public static void init(JavaPlugin instance) {
+    public static void init(JavaPlugin instance, String debug_key) {
         ConsoleLogger.plugin = instance;
         ConsoleLogger.logger = instance.getLogger();
+        ConsoleLogger.debug = instance.getConfig().getBoolean(debug_key);
         ConsoleLogger.template = "v" + instance.getDescription().getVersion() + ": ";
-
-        // the config.get() methods are case sensitive, and we need to make sure we get the debug value if there is one
-        for(String key : instance.getConfig().getKeys(false)) {
-            if(key.equalsIgnoreCase("debug")) {
-                ConsoleLogger.debug = instance.getConfig().getBoolean(key);
-                break;
-            }
-        }
     }
 
     /**
